@@ -29,6 +29,13 @@ class SplashScreen(State):
         self.hint_visible = True
         self.hint_time = pygame.time.get_ticks()
 
+        # Загрузка фонового изображения
+        try:
+            self.background = pygame.image.load("Pazles.png")
+            self.background = pygame.transform.scale(self.background, (size[0], size[1]))
+        except:
+            self.background = None
+
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.QUIT:
@@ -45,7 +52,17 @@ class SplashScreen(State):
             self.hint_time = current_time
 
     def draw(self, screen):
-        screen.fill(BACKGROUND)
+        # Отрисовка фона (изображение или черный экран)
+        if self.background:
+            screen.blit(self.background, (0, 0))
+        else:
+            screen.fill(BACKGROUND)
+
+        # Затемнение фона для лучшей читаемости текста
+        overlay = pygame.Surface((size[0], size[1]), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 128))  # Полупрозрачный черный
+        screen.blit(overlay, (0, 0))
+
         rect = self.surface.get_rect()
         rect.centerx = screen.get_rect().centerx
         rect.centery = screen.get_rect().centery - 100
@@ -63,6 +80,24 @@ class Menuscreen(State):
         self.items = ['Играть', 'Выбрать имя игрока', 'Выйти']
         self.surfaces = [font.render(item, True, (255, 255, 255)) for item in self.items]
         self.selected = 0
+
+        # Загрузка фонового изображения
+        self.background = self.load_background()
+
+    def load_background(self):
+        """Загрузка фонового изображения с обработкой ошибок"""
+        try:
+            # Проверяем существование файла
+            bg_path = "Fone.png"  # или любой другой путь
+            if os.path.exists(bg_path):
+                bg = pygame.image.load(bg_path)
+                return pygame.transform.scale(bg, (size[0], size[1]))
+            else:
+                print(f"Файл фона {bg_path} не найден. Используется чёрный фон.")
+                return None
+        except Exception as e:
+            print(f"Ошибка загрузки фона: {e}")
+            return None
 
     def handle_events(self, events):
         for event in events:
@@ -82,7 +117,18 @@ class Menuscreen(State):
         pass
 
     def draw(self, screen):
-        screen.fill((0, 0, 0))
+        # Отрисовка фона
+        if self.background:
+            screen.blit(self.background, (0, 0))
+        else:
+            screen.fill((0, 0, 0))  # Чёрный фон если нет изображения
+
+        # Затемнение фона для лучшей читаемости меню
+        overlay = pygame.Surface((size[0], size[1]), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 150))  # Полупрозрачный чёрный
+        screen.blit(overlay, (0, 0))
+
+        # Отрисовка пунктов меню
         for i, item in enumerate(self.items):
             color = (255, 0, 0) if i == self.selected else (255, 255, 255)
             surface = font.render(item, True, color)
@@ -277,5 +323,3 @@ while True:
 
     pygame.display.flip()
     clock.tick(FPS)
-
-pygame.quit()
