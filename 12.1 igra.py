@@ -22,7 +22,7 @@ class State(abc.ABC):
 
 class SplashScreen(State):
     def __init__(self):
-        self.text = "Zastavka"
+        self.text = ""
         self.surface = font.render(self.text, True, (255, 255, 255))
         self.hint = "Нажмите для продолжения"
         self.hint_surface = font.render(self.hint, True, (255, 255, 255))
